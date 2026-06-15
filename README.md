@@ -48,6 +48,7 @@ La API quedará disponible en
 | POST   | /api/register  | Registrar usuario, devuelve token  | No   |
 | POST   | /api/login     | Login, devuelve token              | No   |
 | POST   | /api/orders    | Crear pedido con sus líneas        | Sí   |
+| GET    | /api/orders/{id} | Ver un pedido con sus líneas     | Sí   |
 
 
 ## Probar la API con Postman

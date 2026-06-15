@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -45,5 +46,15 @@ class OrderController extends Controller
         });
 
         return response()->json($order->refresh()->load('items.product'), 201);
+    }
+
+    /**
+     * Devuelve un pedido con sus líneas y productos.
+     *
+     * La propiedad la verifica el middleware check.order.owner.
+     */
+    public function show(Order $order): JsonResponse
+    {
+        return response()->json($order->load('items.product'));
     }
 }

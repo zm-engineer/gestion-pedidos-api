@@ -14,4 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/orders', [OrderController::class, 'store']);
+
+    Route::get('/orders/{order}', [OrderController::class, 'show'])
+        ->middleware('check.order.owner');
 });

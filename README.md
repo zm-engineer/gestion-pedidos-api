@@ -49,6 +49,7 @@ La API quedará disponible en
 | POST   | /api/login     | Login, devuelve token              | No   |
 | POST   | /api/orders    | Crear pedido con sus líneas        | Sí   |
 | GET    | /api/orders/{id} | Ver un pedido con sus líneas     | Sí   |
+| GET    | /api/products | Listar productos (cacheado 5 min)   | Sí   |
 
 
 ## Probar la API con Postman

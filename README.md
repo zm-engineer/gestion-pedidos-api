@@ -43,4 +43,46 @@ La API quedará disponible en
 
 ## Endpoints
 
-_Se documentarán conforme se implementen._
+| Método | URI            | Descripción                        | Auth |
+|--------|----------------|------------------------------------|------|
+| POST   | /api/register  | Registrar usuario, devuelve token  | No   |
+| POST   | /api/login     | Login, devuelve token              | No   |
+
+
+
+## Probar la API con Postman
+
+La API corre en `http://localhost`. Todas las peticiones deben incluir el header:
+
+- `Accept: application/json`
+
+Las rutas protegidas requieren además el token devuelto por el login:
+
+- `Authorization: Bearer {token}`
+
+### Flujo básico
+
+1. Hacer **registro** o **login** para obtener un `token`.
+2. Copiar ese `token` de la respuesta.
+3. Usarlo en las rutas protegidas (en Postman: pestaña *Authorization* → tipo *Bearer Token*).
+
+### Ejemplos de petición
+
+**Registro** — `POST /api/register`
+```json
+{
+  "name": "Ana",
+  "email": "ana@test.com",
+  "password": "12345678"
+}
+```
+
+**Login** — `POST /api/login`
+```json
+{
+  "email": "test@example.com",
+  "password": "password"
+}
+```
+> El seeder crea el usuario `test@example.com` con contraseña `password`.
+

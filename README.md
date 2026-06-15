@@ -47,7 +47,7 @@ La API quedará disponible en
 |--------|----------------|------------------------------------|------|
 | POST   | /api/register  | Registrar usuario, devuelve token  | No   |
 | POST   | /api/login     | Login, devuelve token              | No   |
-
+| POST   | /api/orders    | Crear pedido con sus líneas        | Sí   |
 
 
 ## Probar la API con Postman
@@ -86,3 +86,12 @@ Las rutas protegidas requieren además el token devuelto por el login:
 ```
 > El seeder crea el usuario `test@example.com` con contraseña `password`.
 
+**Crear pedido** — `POST /api/orders` _(requiere token)_
+```json
+{
+  "items": [
+    { "product_id": 1, "quantity": 2 },
+    { "product_id": 3, "quantity": 1 }
+  ]
+}
+```

@@ -36,7 +36,7 @@ La lógica del dominio se aplica automáticamente al crear un pedido (`POST /api
 
 ```bash
 # 1. Clonar el repositorio
-git clone <url-del-repositorio>
+git clone https://github.com/zm-engineer/gestion-pedidos-api.git
 cd gestion-pedidos
 
 # 2. Copiar el archivo de entorno

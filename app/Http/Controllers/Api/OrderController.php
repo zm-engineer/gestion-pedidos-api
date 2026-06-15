@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Product;
@@ -35,12 +36,14 @@ class OrderController extends Controller
                 ]);
             }
 
-            // El total se recalcula sumando los subtotales de las líneas. se moverá a un Observer
-            $order->update(['total' => $order->items()->sum('subtotal')]);
+            // El total lo recalcula el OrderItemObserver al crear cada línea.
+            // Disparamos el evento síncrono que descuenta stock; si no alcanza,
+            // su excepción revierte toda la transacción.
+            OrderCreated::dispatch($order);
 
             return $order;
         });
 
-        return response()->json($order->load('items.product'), 201);
+        return response()->json($order->refresh()->load('items.product'), 201);
     }
 }

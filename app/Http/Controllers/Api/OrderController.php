@@ -2,16 +2,30 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    /**
+     * Lista los pedidos del usuario autenticado, del más reciente al más antiguo.
+     */
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        return OrderResource::collection(
+            $request->user()->orders()->latest()->get()
+        );
+    }
+
     /**
      * Crea un pedido para el usuario autenticado con sus líneas.
      */
@@ -45,7 +59,9 @@ class OrderController extends Controller
             return $order;
         });
 
-        return response()->json($order->refresh()->load('items.product'), 201);
+        return (new OrderResource($order->refresh()->load('items.product')))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
@@ -53,8 +69,33 @@ class OrderController extends Controller
      *
      * La propiedad la verifica el middleware check.order.owner.
      */
-    public function show(Order $order): JsonResponse
+    public function show(Order $order): OrderResource
     {
-        return response()->json($order->load('items.product'));
+        return new OrderResource($order->load('items.product'));
+    }
+
+    /**
+     * Cancela un pedido. Solo se permite si está en estado 'pending'.
+     *
+     * No se restaura el stock (fuera de alcance).
+     */
+    public function cancel(Order $order): OrderResource|JsonResponse
+    {
+        if ($order->status !== 'pending') {
+            return response()->json([
+                'message' => 'Solo se pueden cancelar pedidos pendientes.',
+            ], 422);
+        }
+
+        // El cambio de estado y la devolución de stock van juntos en una
+        // transacción: si el listener fallara, no quedaría el pedido cancelado
+        // sin haber restaurado el inventario.
+        DB::transaction(function () use ($order) {
+            $order->update(['status' => 'cancelled']);
+
+            OrderCancelled::dispatch($order);
+        });
+
+        return new OrderResource($order->load('items.product'));
     }
 }

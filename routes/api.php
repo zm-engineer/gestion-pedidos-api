@@ -13,8 +13,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
 
     Route::get('/orders/{order}', [OrderController::class, 'show'])
+        ->middleware('check.order.owner');
+
+    Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel'])
         ->middleware('check.order.owner');
 });
